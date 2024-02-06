@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
   entry: './index.ts', // Assuming your TypeScript file is named app.ts
   output: {
@@ -41,6 +42,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: "index.html",
       template: path.resolve(__dirname, "index.html"),
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: './src/assets', to: 'assets' } // This copies the 'assets' folder to 'dist/assets'
+      ],
     }),
   ],
   devServer: {
