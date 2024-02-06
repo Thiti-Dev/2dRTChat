@@ -1,0 +1,27 @@
+// styles.scss
+$primary-color: #3498db;
+
+// Centering everything
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+body {
+  background-color: $primary-color;
+}
+
+h1 {
+  color: white;
+}
+
+#main-pixi-container{
+  text-align: center;
+  width: 1200px;
+  height: 800px;
+  background-color: white;
+}
