@@ -1,0 +1,1 @@
+export const DEFAULT_VOLUME: number = 0.1
