@@ -26,7 +26,7 @@ export class Character{
         this.sprite = sprite
     }
 
-    public spawnToScene(app: Application<HTMLCanvasElement>,x:number,y:number){
+    public spawnToScene(app: Container,x:number,y:number){
         const container = new Container();
         container.x = x
         container.y = y
@@ -53,7 +53,7 @@ export class Character{
 
         container.addChild(this.sprite)
         container.addChild(nameTag)
-        app.stage.addChild(container);
+        app.addChild(container);
         this.nameTag = nameTag
         this.container = container
 
@@ -76,7 +76,6 @@ export class Character{
             const movingFactor = this.movingFactor 
             if(movingFactor !== 0){
                 this.container.x+=movingFactor
-
                 broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y} as PlayerPositioningUpdatePayload)
             }
 
@@ -121,5 +120,9 @@ export class Character{
     public setNameTag(name:string){
         if(!this.nameTag) return
         this.nameTag.text = name
+    }
+
+    public getContainer(): Container{
+        return this.container
     }
 }

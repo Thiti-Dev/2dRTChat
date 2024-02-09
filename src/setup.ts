@@ -1,7 +1,9 @@
-import { Application, Texture, TilingSprite } from "pixi.js";
+import { Application, Container, Graphics, Texture, TilingSprite } from "pixi.js";
 import { Character } from "./classes/character";
 import appContext from "./states/app-context";
-export async function setupPixiApplication(container: HTMLElement): Promise<Application<HTMLCanvasElement>>{
+import { CANVAS_SIZE } from "./shared/constants/config";
+import world from "./states/world";
+export async function setupPixiApplication(container: HTMLElement): Promise<{app:Application<HTMLCanvasElement>;worldContainer: Container}>{
     const app = new Application<HTMLCanvasElement>({
         width: container.clientWidth, // Match the width of your div
         height: container.clientHeight, // Match the height of your div
@@ -13,9 +15,9 @@ export async function setupPixiApplication(container: HTMLElement): Promise<Appl
     });
 
     container.appendChild(app.view);
-
     addTilingBackgroundImage(app)
-    return app
+    const worldContainer = createWorldContainer(app)
+    return {app, worldContainer}
 }
 
 function addTilingBackgroundImage(app: Application<HTMLCanvasElement>){
@@ -32,12 +34,24 @@ function addTilingBackgroundImage(app: Application<HTMLCanvasElement>){
     // tilingSprite.scale = {x:1,y:1}
     // tilingSprite.tileScale = {x:1,y:1}
     app.stage.addChild(tilingSprite);
+    world.setTilingBackgroundSprite(tilingSprite)
+    
+}
 
+function createWorldContainer(app: Application<HTMLCanvasElement>):Container{
+        const worldContainer = new Container()
+        worldContainer.width = CANVAS_SIZE.WIDTH
+        worldContainer.height = CANVAS_SIZE.HEIGHT
+        app.stage.addChild(worldContainer)
+        return worldContainer
+}
+
+export function createProtagonist(app: Application<HTMLCanvasElement>,container: Container){
     const protagonist = new Character("Me") // Default placeholder name when isn't finished loading -> Me
     protagonist.registerCustomTicker(app)
-    protagonist.spawnToScene(app,70,530)
+    protagonist.spawnToScene(container,70,530)
     protagonist.registerMovementListener()
 
     appContext.setProtagonist(protagonist)
-    
+
 }

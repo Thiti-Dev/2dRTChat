@@ -22,10 +22,11 @@ export function positioningEventHandler(stringifiedData: string){
 // Spawn online player which is currently in the RTC mesh
 export function spawnSyncedPlayer(id:string,who:string){
     const app = appContext.getPixiApplication()
+    const world = appContext.getWorldContainer()
 
     const playerCharacter = new Character(who)
     playerCharacter.registerCustomTicker(app)
-    playerCharacter.spawnToScene(app,90,530)
+    playerCharacter.spawnToScene(world,90,530)
     PlayerDatas[id] = {
         name: who,
         position:{x:90,y:530},
