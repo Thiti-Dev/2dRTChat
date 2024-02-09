@@ -40,14 +40,14 @@ function addTilingBackgroundImage(app: Application<HTMLCanvasElement>){
 
 function createWorldContainer(app: Application<HTMLCanvasElement>):Container{
         const worldContainer = new Container()
-        worldContainer.width = CANVAS_SIZE.WIDTH
+        worldContainer.width = CANVAS_SIZE.WIDTH * 100
         worldContainer.height = CANVAS_SIZE.HEIGHT
         app.stage.addChild(worldContainer)
         return worldContainer
 }
 
 export function createProtagonist(app: Application<HTMLCanvasElement>,container: Container){
-    const protagonist = new Character("Me") // Default placeholder name when isn't finished loading -> Me
+    const protagonist = new Character("Me", true) // Default placeholder name when isn't finished loading -> Me
     protagonist.registerCustomTicker(app)
     protagonist.spawnToScene(container,70,530)
     protagonist.registerMovementListener()
