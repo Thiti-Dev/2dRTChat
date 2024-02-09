@@ -1,4 +1,7 @@
 import { Application, Container, DisplayObject, Sprite, Text, TextStyle } from "pixi.js";
+import { broadCastDataToPeers } from "../core/voice-chat";
+import type { PlayerPositioningUpdatePayload } from "../shared/types";
+import appContext from "../states/app-context";
 
 export class Character{
     private sprite!: Sprite;
@@ -6,9 +9,16 @@ export class Character{
     private hasJustGoneLeftDirection = false
     private container!:Container<DisplayObject>
     private alreadyHasGoneLeft = false
+    private socketID: string|null = null
+    private nameTag:Text| null  = null
     constructor(private name: string){
         console.log(`Character: ${name} has been initiated`)
         this.setSprite(Sprite.from('https://pixijs.com/assets/flowerTop.png'))
+    }
+
+    private getSocketID(){
+        if(!this.socketID) this.socketID = appContext.getSocketInstance().id!
+        return this.socketID
     }
 
     public setSprite(sprite: Sprite){
@@ -44,6 +54,7 @@ export class Character{
         container.addChild(this.sprite)
         container.addChild(nameTag)
         app.stage.addChild(container);
+        this.nameTag = nameTag
         this.container = container
 
     }
@@ -65,6 +76,8 @@ export class Character{
             const movingFactor = this.movingFactor 
             if(movingFactor !== 0){
                 this.container.x+=movingFactor
+
+                broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y} as PlayerPositioningUpdatePayload)
             }
 
             if(movingFactor === -2 && this.sprite.scale.x > 0){
@@ -94,5 +107,19 @@ export class Character{
             }
             event.preventDefault();
         }, false);
+    }
+
+    public setPosition(x:number,y:number){
+        this.container.x = x
+        this.container.y = y
+    }
+
+    public remove(){
+        this.container.removeFromParent()
+    }
+
+    public setNameTag(name:string){
+        if(!this.nameTag) return
+        this.nameTag.text = name
     }
 }

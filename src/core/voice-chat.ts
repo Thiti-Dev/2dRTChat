@@ -1,11 +1,13 @@
-import { io } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 import Peer from "simple-peer";
-import { SignalingPayload, PeerConn,SignalData } from "../shared/types";
+import type { SignalingPayload, PeerConn,SignalData } from "../shared/types";
 import { DEFAULT_VOLUME } from "../shared/constants/config";
+import { removePlayer, positioningEventHandler, spawnSyncedPlayer } from "./player-synchronization";
+import appContext from "../states/app-context";
 
-let localStream:MediaStream,peerLists:PeerConn[]=[]
-const socket = io('http://localhost:3000')
-export async function setupAudioStreaming(){
+let localStream:MediaStream,peerLists:PeerConn[]=[] // already considered isolates into mobx state
+
+export async function setupAudioStreaming(socket: Socket){
     try {
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -27,20 +29,28 @@ export async function setupAudioStreaming(){
                 peerLists.push({
                     peerID: payload.callerID,
                     peer,
+                    IAM: payload.callerIAM
                 })
-                console.log('[audio-server]: Joined user -> ', payload.callerID)
+                console.log(`[audio-server]: Joined user -> socker_id:${payload.callerID} , IAM:${payload.callerIAM}`)
+            
+                 // Spawn to world
+                 spawnSyncedPlayer(payload.callerID,payload.callerIAM)
             });
 
             socket.on("receiving returned signal", (payload:SignalingPayload) => {
                 const item = peerLists.find(p => p.peerID === payload.id);
                 item?.peer.signal(payload.signal);
 
-                console.log('[audio-server]: Received returned signal -> ', payload)
+                console.log(`[audio-server]: Received returned signal from socket_id:${payload.id} IAM: ${payload.callerIAM}`) // rename later, this shouldn't be named callerIAM
+            
+                // Spawn to world
+                spawnSyncedPlayer(payload.id!,payload.callerIAM)
             });
 
             socket.on("disconnect notify", (disconnectedSocketID:string) => {
                 console.log('[audio-server]: Received disconnection notify from: ', disconnectedSocketID)
                 document.getElementById(disconnectedSocketID)?.remove()
+                removePlayer(disconnectedSocketID) // remove disconnected player from the world
                 
             });
     } catch (error) {
@@ -66,28 +76,49 @@ function appendAudioElement(socketID:string,stream:MediaStream){
 
 
 function createPeer(userToSignal:string, callerID:string, stream:MediaStream) {
+    const socket = appContext.getSocketInstance()
+
     const peer = new Peer({
         initiator: true,
         trickle: false,
         stream,
+        channelName: 'ConfinedVirtualSpace'
     });
     peer.on("signal", signal => {
         socket.emit("sending signal", { userToSignal, callerID, signal })
     })
+
     appendAudioElement(userToSignal, stream)
+
+    peer.on('data', positioningEventHandler);
+
     return peer;
 }
 
 function addPeer(incomingSignal:SignalData, callerID:string, stream:MediaStream) {
+    const socket = appContext.getSocketInstance()
+
     const peer = new Peer({
         initiator: false,
         trickle: false,
         stream,
+        channelName: 'ConfinedVirtualSpace'
     })
     peer.on("signal", signal => {
         socket.emit("returning signal", { signal, callerID })
     })
     peer.signal(incomingSignal);
     appendAudioElement(callerID, stream)
+
+    peer.on('data', positioningEventHandler);
+
     return peer;
+}
+
+// Isolate into mobx action later . . .
+export function broadCastDataToPeers(payload:any){
+    const stringifiedPayload= JSON.stringify(payload)
+    for(const {peer} of peerLists){
+        peer.send(stringifiedPayload)
+    }
 }

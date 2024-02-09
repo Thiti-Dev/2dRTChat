@@ -1,6 +1,7 @@
-import { Application, Assets, Sprite, Texture, TilingSprite } from "pixi.js";
+import { Application, Texture, TilingSprite } from "pixi.js";
 import { Character } from "./classes/character";
-export async function setupPixiApplication(container: HTMLElement){
+import appContext from "./states/app-context";
+export async function setupPixiApplication(container: HTMLElement): Promise<Application<HTMLCanvasElement>>{
     const app = new Application<HTMLCanvasElement>({
         width: container.clientWidth, // Match the width of your div
         height: container.clientHeight, // Match the height of your div
@@ -14,7 +15,7 @@ export async function setupPixiApplication(container: HTMLElement){
     container.appendChild(app.view);
 
     addTilingBackgroundImage(app)
-    
+    return app
 }
 
 function addTilingBackgroundImage(app: Application<HTMLCanvasElement>){
@@ -32,9 +33,11 @@ function addTilingBackgroundImage(app: Application<HTMLCanvasElement>){
     // tilingSprite.tileScale = {x:1,y:1}
     app.stage.addChild(tilingSprite);
 
-    const character = new Character("Thiti-Dev")
-    character.registerCustomTicker(app)
-    character.spawnToScene(app,70,530)
-    character.registerMovementListener()
+    const protagonist = new Character("Me") // Default placeholder name when isn't finished loading -> Me
+    protagonist.registerCustomTicker(app)
+    protagonist.spawnToScene(app,70,530)
+    protagonist.registerMovementListener()
+
+    appContext.setProtagonist(protagonist)
     
 }
