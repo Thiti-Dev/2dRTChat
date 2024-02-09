@@ -1,4 +1,5 @@
 import Peer from "simple-peer";
+import { Character } from "../classes/character";
 
 type SignalData = Peer.SignalData
 
@@ -28,9 +29,17 @@ type PlayerPositioningUpdatePayload = {
     id: string;
 }
 
+type PlayerData = {
+    name: string
+    position: {x:number,y:number}
+    character: Character
+    audioElement?: HTMLAudioElement
+}
+
 export {
     PeerConn,
     SignalingPayload,
     SignalData,
-    PlayerPositioningUpdatePayload
+    PlayerPositioningUpdatePayload,
+    PlayerData
 }

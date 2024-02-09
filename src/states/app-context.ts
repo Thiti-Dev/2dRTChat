@@ -3,6 +3,7 @@ import type { Application, Container } from "pixi.js"
 import type { Socket } from "socket.io-client";
 import { Character } from "../classes/character";
 import world from "./world";
+import players from "./players";
 
 class AppContext {
     private pixiApp!:Application<HTMLCanvasElement>;
@@ -22,6 +23,9 @@ class AppContext {
 
     public setSocketInstance(s: Socket){
         console.log("[Trace]: Socket has been stored into AppContext")
+
+        // setting up synchronization event
+        players.setupSocketEventHandler(s)
         this.socketInstance = s
     }
 

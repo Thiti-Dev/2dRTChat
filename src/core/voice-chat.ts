@@ -2,14 +2,19 @@ import type { Socket } from "socket.io-client";
 import Peer from "simple-peer";
 import type { SignalingPayload, PeerConn,SignalData } from "../shared/types";
 import { DEFAULT_VOLUME } from "../shared/constants/config";
-import { removePlayer, positioningEventHandler, spawnSyncedPlayer } from "./player-synchronization";
 import appContext from "../states/app-context";
+import Players from "../states/players";
 
 let localStream:MediaStream,peerLists:PeerConn[]=[] // already considered isolates into mobx state
 
 export async function setupAudioStreaming(socket: Socket){
     try {
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            channelCount: 2,
+            autoGainControl: true
+        } });
 
         socket.emit("join room", "1234");
             socket.on("all users", (users) => {
@@ -34,7 +39,7 @@ export async function setupAudioStreaming(socket: Socket){
                 console.log(`[audio-server]: Joined user -> socker_id:${payload.callerID} , IAM:${payload.callerIAM}`)
             
                  // Spawn to world
-                 spawnSyncedPlayer(payload.callerID,payload.callerIAM)
+                Players.spawnSyncedPlayer(payload.callerID,payload.callerIAM)
             });
 
             socket.on("receiving returned signal", (payload:SignalingPayload) => {
@@ -44,13 +49,13 @@ export async function setupAudioStreaming(socket: Socket){
                 console.log(`[audio-server]: Received returned signal from socket_id:${payload.id} IAM: ${payload.callerIAM}`) // rename later, this shouldn't be named callerIAM
             
                 // Spawn to world
-                spawnSyncedPlayer(payload.id!,payload.callerIAM)
+                Players.spawnSyncedPlayer(payload.id!,payload.callerIAM)
             });
 
             socket.on("disconnect notify", (disconnectedSocketID:string) => {
                 console.log('[audio-server]: Received disconnection notify from: ', disconnectedSocketID)
                 document.getElementById(disconnectedSocketID)?.remove()
-                removePlayer(disconnectedSocketID) // remove disconnected player from the world
+                Players.removePlayer(disconnectedSocketID) // remove disconnected player from the world
                 
             });
     } catch (error) {
@@ -68,10 +73,12 @@ function appendAudioElement(socketID:string,stream:MediaStream){
         </div>
     `;
     document.getElementById('users')!.appendChild(userDiv);
-    const userAudio: any = document.getElementById(`${socketID}-audio`)!;
+    const userAudio = document.getElementById(`${socketID}-audio`)! as HTMLAudioElement;
     userAudio.srcObject = stream;
     userAudio.volume = DEFAULT_VOLUME
     userAudio.play();
+
+    Players.registerAudioElementForPlayer(socketID, userAudio)
 }
 
 
@@ -90,7 +97,7 @@ function createPeer(userToSignal:string, callerID:string, stream:MediaStream) {
 
     appendAudioElement(userToSignal, stream)
 
-    peer.on('data', positioningEventHandler);
+    peer.on('data', Players.positioningEventHandler.bind(Players));
 
     return peer;
 }
@@ -110,7 +117,7 @@ function addPeer(incomingSignal:SignalData, callerID:string, stream:MediaStream)
     peer.signal(incomingSignal);
     appendAudioElement(callerID, stream)
 
-    peer.on('data', positioningEventHandler);
+    peer.on('data', Players.positioningEventHandler.bind(Players));
 
     return peer;
 }

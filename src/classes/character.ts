@@ -2,6 +2,7 @@ import { Application, Container, DisplayObject, Sprite, Text, TextStyle } from "
 import { broadCastDataToPeers } from "../core/voice-chat";
 import type { PlayerPositioningUpdatePayload } from "../shared/types";
 import appContext from "../states/app-context";
+import players from "../states/players";
 
 export class Character{
     private sprite!: Sprite;
@@ -11,9 +12,11 @@ export class Character{
     private alreadyHasGoneLeft = false
     private socketID: string|null = null
     private nameTag:Text| null  = null
-    constructor(private name: string){
+    private isProtagonist: boolean = false
+    constructor(private name: string,protagonist: boolean = false){
         console.log(`Character: ${name} has been initiated`)
         this.setSprite(Sprite.from('https://pixijs.com/assets/flowerTop.png'))
+        this.isProtagonist = protagonist
     }
 
     private getSocketID(){
@@ -72,19 +75,28 @@ export class Character{
                 }else isIncrement = false
             }
             this.container.scale.set(scalingFactor);
-            
-            const movingFactor = this.movingFactor 
-            if(movingFactor !== 0){
-                this.container.x+=movingFactor
-                broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y} as PlayerPositioningUpdatePayload)
-            }
 
-            if(movingFactor === -2 && this.sprite.scale.x > 0){
-                this.sprite.scale.x = -this.sprite.scale.x;
-            }else if(movingFactor === 2 && this.sprite.scale.x < 0){
-                this.sprite.scale.x = Math.abs(this.sprite.scale.x)
-            }
+            if(!this.isProtagonist) return
+            this.positioningPlayerBasedOnMovingFactor()
         });
+    }
+
+    public positioningPlayerBasedOnMovingFactor(syncRequst: boolean = false){
+
+        if(syncRequst) return broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y} as PlayerPositioningUpdatePayload)
+
+        const movingFactor = this.movingFactor 
+        if(movingFactor !== 0){
+            this.container.x+=movingFactor
+            broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y} as PlayerPositioningUpdatePayload)
+            players.protagonistMovementNotify(this.container.x)
+        }
+
+        if(movingFactor === -2 && this.sprite.scale.x > 0){
+            this.sprite.scale.x = -this.sprite.scale.x;
+        }else if(movingFactor === 2 && this.sprite.scale.x < 0){
+            this.sprite.scale.x = Math.abs(this.sprite.scale.x)
+        }
     }
 
     public registerMovementListener(){
