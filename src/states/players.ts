@@ -77,6 +77,7 @@ export class Players{
     public removePlayer(id:string){
         if(!this.playerDatas.hasOwnProperty(id)) return
         this.playerDatas[id].character.remove()
+        delete this.playerDatas[id]
     }
 
     public registerAudioElementForPlayer(id:string,audioElement: HTMLAudioElement){

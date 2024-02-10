@@ -54,6 +54,7 @@ export async function setupAudioStreaming(socket: Socket){
 
             socket.on("disconnect notify", (disconnectedSocketID:string) => {
                 console.log('[audio-server]: Received disconnection notify from: ', disconnectedSocketID)
+                peerLists = peerLists.filter(p => p.peerID !== disconnectedSocketID); // removing out from existing peer lists
                 document.getElementById(disconnectedSocketID)?.remove()
                 Players.removePlayer(disconnectedSocketID) // remove disconnected player from the world
                 
@@ -98,6 +99,7 @@ function createPeer(userToSignal:string, callerID:string, stream:MediaStream) {
     appendAudioElement(userToSignal, stream)
 
     peer.on('data', Players.positioningEventHandler.bind(Players));
+    setupPeerEvents(peer)
 
     return peer;
 }
@@ -118,8 +120,25 @@ function addPeer(incomingSignal:SignalData, callerID:string, stream:MediaStream)
     appendAudioElement(callerID, stream)
 
     peer.on('data', Players.positioningEventHandler.bind(Players));
+    setupPeerEvents(peer)
 
     return peer;
+}
+
+function setupPeerEvents(peer: Peer.Instance){
+    peer.on('error', (err) => {
+        console.log('Connection error:', err);
+    });
+    
+    // Listen for the 'close' event
+    peer.on('close', () => {
+        console.log('Connection closed');
+    });
+    
+    // Listen for the 'disconnect' event (this event is specific to the signaling server)
+    peer.on('disconnect', () => {
+        console.log('Disconnected from signaling server');
+    });
 }
 
 // Isolate into mobx action later . . .
