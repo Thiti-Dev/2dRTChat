@@ -26,7 +26,9 @@ type PlayerPositioningUpdatePayload = {
     type: 'pos_update';
     x: number;
     y: number;
+    isDormant?: boolean
     id: string;
+    directionHeading: 'LEFT' | 'RIGHT'
 }
 
 type PlayerData = {
