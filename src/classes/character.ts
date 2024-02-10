@@ -1,11 +1,12 @@
-import { Application, Container, DisplayObject, Sprite, Text, TextStyle } from "pixi.js";
+import { AnimatedSprite, Application, Assets, Container, DisplayObject, Sprite, Text, TextStyle } from "pixi.js";
 import { broadCastDataToPeers } from "../core/voice-chat";
 import type { PlayerPositioningUpdatePayload } from "../shared/types";
 import appContext from "../states/app-context";
 import players from "../states/players";
+import { isAbsoluteNumber } from "../utils/maths/is-absolute-number";
 
 export class Character{
-    private sprite!: Sprite;
+    private sprite!: AnimatedSprite;
     private movingFactor = 0;
     private hasJustGoneLeftDirection = false
     private container!:Container<DisplayObject>
@@ -13,9 +14,11 @@ export class Character{
     private socketID: string|null = null
     private nameTag:Text| null  = null
     private isProtagonist: boolean = false
+    private hasBroadcastedDormantStateOnce: boolean = false
     constructor(private name: string,protagonist: boolean = false){
         console.log(`Character: ${name} has been initiated`)
-        this.setSprite(Sprite.from('https://pixijs.com/assets/flowerTop.png'))
+        //this.setSprite(Sprite.from('https://pixijs.com/assets/flowerTop.png'))
+        this.animatedSpriteBuilder()
         this.isProtagonist = protagonist
     }
 
@@ -24,10 +27,23 @@ export class Character{
         return this.socketID
     }
 
-    public setSprite(sprite: Sprite){
-        sprite.anchor.set(0.5)
-        this.sprite = sprite
+    private animatedSpriteBuilder(){
+        const animations = Assets.cache.get("./assets/sheets/c1.json").data.animations;
+        // create an animated sprite
+        const character = AnimatedSprite.fromFrames(animations["walk"]);
+        character.anchor.set(0.5)
+        character.width = 250
+        character.height = 250
+        character.animationSpeed = 1 / 6; // 6 fps
+        character.gotoAndStop(3)
+        
+        this.sprite = character
     }
+
+    // public setSprite(sprite: Sprite){
+    //     sprite.anchor.set(0.5)
+    //     this.sprite = sprite
+    // }
 
     public spawnToScene(app: Container,x:number,y:number){
         const container = new Container();
@@ -41,13 +57,13 @@ export class Character{
             dropShadowAngle: 2.1,
             dropShadowBlur: 4,
             dropShadowColor: '0x111111',
-            dropShadowDistance: 5,
+            dropShadowDistance: 2,
             fill: ['#ffffff'],
-            stroke: '#004620',
-            fontSize: 30,
+            stroke: '#000000',
+            fontSize: 18,
             fontWeight: 'lighter',
             lineJoin: 'round',
-            strokeThickness: 12,
+            strokeThickness: 5,
         });
         const nameTag = new Text(this.name,textStyle);
         
@@ -83,13 +99,26 @@ export class Character{
 
     public positioningPlayerBasedOnMovingFactor(syncRequst: boolean = false){
 
-        if(syncRequst) return broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y} as PlayerPositioningUpdatePayload)
+        if(syncRequst) return broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y,isDormant:true,directionHeading: this.getCurrentDirectionHeading()} as PlayerPositioningUpdatePayload)
 
         const movingFactor = this.movingFactor 
         if(movingFactor !== 0){
             this.container.x+=movingFactor
-            broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y} as PlayerPositioningUpdatePayload)
+            broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y,directionHeading:this.getCurrentDirectionHeading()} as PlayerPositioningUpdatePayload)
+            this.hasBroadcastedDormantStateOnce = false
             players.protagonistMovementNotify(this.container.x)
+
+            // playing animation if it's currently moving
+            if(!this.sprite.playing){
+                this.sprite.play()
+            }
+        }
+        else{
+            if(this.sprite.playing) this.sprite.gotoAndStop(3)
+            if(!this.hasBroadcastedDormantStateOnce){
+                this.hasBroadcastedDormantStateOnce = true
+                broadCastDataToPeers({id:this.getSocketID(),type:'pos_update',x: this.container.x,y:this.container.y,isDormant:true,directionHeading:this.getCurrentDirectionHeading()} as PlayerPositioningUpdatePayload)
+            }
         }
 
         if(movingFactor === -2 && this.sprite.scale.x > 0){
@@ -136,5 +165,15 @@ export class Character{
 
     public getContainer(): Container{
         return this.container
+    }
+
+    public getSprite(): AnimatedSprite{
+        return this.sprite
+    }
+
+    public getCurrentDirectionHeading(): PlayerPositioningUpdatePayload['directionHeading']{
+        if(isAbsoluteNumber(this.sprite.scale.x)) return 'RIGHT'
+        return 'LEFT'
+
     }
 }
