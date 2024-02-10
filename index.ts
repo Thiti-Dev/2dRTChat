@@ -18,6 +18,7 @@ import { createProtagonist, setupPixiApplication } from "./src/setup";
 import { setupAudioStreaming } from "./src/core/voice-chat";
 import appContext from "./src/states/app-context";
 import { socketConnect } from "./src/core/socket";
+import { AnimatedSprite, Assets } from "pixi.js";
 
 
 if (!new class { x:any }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly') // Mobx spec complaint ensuring
@@ -28,6 +29,10 @@ const pixiContainer = document.getElementById('main-pixi-container');
 
 if(pixiContainer){
     (async() => {
+        // assets loader
+        await Assets.load(["./assets/sheets/c1.json"])
+        // -------------
+
         // Create a new Pixi application
         const {app,worldContainer} = await setupPixiApplication(pixiContainer)
         appContext.setPixiApplication(app, worldContainer)
