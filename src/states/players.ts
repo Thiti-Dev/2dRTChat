@@ -3,6 +3,7 @@ import { Character } from "../classes/character"
 import { VOIP_OUT_OF_RANGE_DISTANCE } from "../shared/constants/config"
 import { PlayerData, PlayerPositioningUpdatePayload } from "../shared/types"
 import appContext from "./app-context"
+import { isAbsoluteNumber } from "../utils/maths/is-absolute-number"
 
 export class Players{
     private playerDatas: Record<string,PlayerData> = {}
@@ -13,6 +14,30 @@ export class Players{
         const data = JSON.parse(stringifiedData) as PlayerPositioningUpdatePayload
         if(data.type !== 'pos_update') return
         if(!this.playerDatas.hasOwnProperty(data.id)) return
+
+        const playerSprite = this.playerDatas[data.id].character.getSprite()
+
+        // Dormant detection
+        if(data.isDormant){
+            // if dormant state provided
+            if(playerSprite.playing){
+                // if animation is currently playing
+                playerSprite.gotoAndStop(3)
+            }
+        }else{
+            // if still walking
+            if(!playerSprite.playing) playerSprite.play()
+        }
+
+        // directional renderization
+        if(data.directionHeading === 'LEFT' && isAbsoluteNumber(playerSprite.scale.x)){
+            playerSprite.scale.x = -playerSprite.scale.x
+        }else if (data.directionHeading === 'RIGHT' && !isAbsoluteNumber(playerSprite.scale.x)){
+            playerSprite.scale.x = Math.abs(playerSprite.scale.x)
+        }
+
+
+
     
         this.playerDatas[data.id].character.setPosition(data.x,data.y)
     
