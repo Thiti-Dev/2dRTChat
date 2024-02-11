@@ -21,6 +21,7 @@ import appContext from "./src/states/app-context";
 import { socketConnect } from "./src/core/socket";
 import '@pixi/gif';
 import { AnimatedSprite, Assets } from "pixi.js";
+import { CANVAS_SIZE } from "./src/shared/constants/config";
 
 
 if (!new class { x:any }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly') // Mobx spec complaint ensuring
@@ -30,6 +31,8 @@ if (!new class { x:any }().hasOwnProperty('x')) throw new Error('Transpiler is n
 const pixiContainer = document.getElementById('main-pixi-container');
 
 if(pixiContainer){
+    CANVAS_SIZE.WIDTH = pixiContainer.clientWidth; // width stored for further calculations
+
     (async() => {
         // assets loader
         await Assets.load(["./assets/sheets/c1.json", './assets/gifs/mosaic-blur.gif'])

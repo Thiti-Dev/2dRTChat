@@ -1,6 +1,6 @@
 // styles.scss
 $primary-color: #3498db;
-$canvas-width: 80vw;
+$canvas-width: 1600px;
 $canvas-min-allowed-width: 1600px;
 
 // Centering everything
@@ -30,7 +30,7 @@ h1 {
 
 #main-pixi-container{
   text-align: center;
-  min-width: $canvas-min-allowed-width;
+  //min-width: $canvas-min-allowed-width;
   width: $canvas-width;
   height: 800px;
   //background-color: white;

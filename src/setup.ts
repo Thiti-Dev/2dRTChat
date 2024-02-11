@@ -11,6 +11,7 @@ export async function setupPixiApplication(container: HTMLElement): Promise<{app
     });
 
     window.addEventListener('resize', () => {
+        //CANVAS_SIZE.WIDTH = container.clientWidth // un-comment this later on if you wanna implement the dynamic resizing support
         app.renderer.resize(container.clientWidth, container.clientHeight);
     });
 

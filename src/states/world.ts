@@ -20,13 +20,13 @@ export class World{
            if(x < (pivotStage - CANVAS_SIZE.WIDTH)){
                 console.log("[World]: Pivoting the world to the left")
                 this.isWorldPivoting = true
-                this.pivotedStageHistory-=1200;
+                this.pivotedStageHistory-=CANVAS_SIZE.WIDTH;
                 gsap.to(worldContainer.position, {x: worldContainer.position.x+CANVAS_SIZE.WIDTH,duration: 2,ease:'power2.out'})
                 gsap.to(this.backgroundSprite.tilePosition, { x: this.backgroundSprite.tilePosition.x+CANVAS_SIZE.WIDTH, duration: 2, ease: "power2.out" }).then(() => this.isWorldPivoting = false)
            }else if(x > ((pivotStage - CANVAS_SIZE.WIDTH) + CANVAS_SIZE.WIDTH)){ // because i set the default pivot = CANVAS_SIZE.WIDTH, so here is a bit messy condition presented
                 console.log("Pivoting the world to the right")
                 this.isWorldPivoting = true
-                this.pivotedStageHistory+=1200;
+                this.pivotedStageHistory+=CANVAS_SIZE.WIDTH;
                 gsap.to(worldContainer.position, {x: worldContainer.position.x-CANVAS_SIZE.WIDTH,duration: 2,ease:'power2.out'})
                 gsap.to(this.backgroundSprite.tilePosition, { x: this.backgroundSprite.tilePosition.x-CANVAS_SIZE.WIDTH, duration: 2, ease: "power2.out" }).then(() => this.isWorldPivoting = false)
             }
