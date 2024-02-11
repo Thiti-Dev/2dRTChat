@@ -4,6 +4,8 @@ import type { SignalingPayload, PeerConn,SignalData } from "../shared/types";
 import { DEFAULT_VOLUME } from "../shared/constants/config";
 import appContext from "../states/app-context";
 import Players from "../states/players";
+import { sleep } from "../utils/common";
+import players from "../states/players";
 
 let localStream:MediaStream,peerLists:PeerConn[]=[] // already considered isolates into mobx state
 
@@ -82,6 +84,70 @@ function appendAudioElement(socketID:string,stream:MediaStream){
     userAudio.play();
 
     Players.registerAudioElementForPlayer(socketID, userAudio)
+
+    /* ----------------------------- Audio Analyzer ----------------------------- */
+    const audioContext = new AudioContext();
+
+    // Create a MediaStreamAudioSourceNode to connect to the incoming audio stream
+    const audioSourceNode = audioContext.createMediaStreamSource(stream);
+
+    // Create an AnalyserNode to analyze the audio data
+    const analyserNode = audioContext.createAnalyser();
+    analyserNode.fftSize = 32; // Adjust the FFT size based on your requirements
+
+    // Connect the audio source to the analyser
+    audioSourceNode.connect(analyserNode);
+    // Define a function to analyze the audio data periodically
+
+    // enclosed
+    const playerCharacter = players.getPlayerFromSocketID(socketID)
+    //
+    async function checkAudioMuted() {
+        // Create a buffer to store frequency data
+        const bufferLength = analyserNode.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        // Get frequency data from the analyser
+        analyserNode.getByteFrequencyData(dataArray);
+
+        // Calculate the average volume level
+        let totalVolume = 0;
+        for (let i = 0; i < bufferLength; i++) {
+            totalVolume += dataArray[i];
+        }
+        const averageVolume = totalVolume / bufferLength;
+        console.log(averageVolume)
+
+        if(averageVolume === 0){
+            // if mute detected
+            // set setTalkingState of this Character instance 
+            playerCharacter.character.setTalkingState(false)
+            setTimeout(checkAudioMuted, 500);
+        }else{
+            // when buffers still has bitsound going on nake it frequent
+            playerCharacter.character.setTalkingState(true)
+            setTimeout(checkAudioMuted, 15);
+        }
+        
+
+        // Determine if the audio is effectively muted [This method to slow to react on the bit receive]
+        /*
+            onst thresholdPercentage = 20; // 20% lower than the observed average volume level
+            const threshold = 20 * (thresholdPercentage / 100);
+            const isMuted = averageVolume < threshold; // Adjust threshold as needed
+            //Do something based on the mute status
+            if (isMuted) {
+                console.log(`[${socketID}]: Audio muted`);
+            } else {
+                console.log(`[${socketID}]: Audio not muted`);
+            }
+        */
+        /* -------------------------------------------------------------------------- */
+    }
+
+    // Periodically check the audio data for mute status
+    setTimeout(checkAudioMuted, 15); // Adjust interval as needed
+    /* -------------------------------------------------------------------------- */
 }
 
 

@@ -104,6 +104,10 @@ export class Players{
             appContext.getProtagonistCharacter().positioningPlayerBasedOnMovingFactor(true) // broadcast position to all peers
         })
     }
+
+    public getPlayerFromSocketID(socketID: string){
+        return this.playerDatas[socketID] ?? null
+    }
 }
 
 export default new Players()

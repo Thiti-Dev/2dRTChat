@@ -168,13 +168,14 @@ export class Character{
     }
 
     public setNameTag(name:string){
+        this.name = name // persist
         if(!this.nameTag) return
         this.nameTag.text = name
     }
 
     public setTalkingState(talk: boolean){
         if(!this.nameTag) return
-        this.nameTag.text = talk ? this.nameTag.text + " 🔊" : this.name
+        this.nameTag.text = talk ? `${this.name} 🔊` : this.name
     }
 
     public getContainer(): Container{
