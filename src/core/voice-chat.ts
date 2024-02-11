@@ -222,6 +222,7 @@ function setupPeerEvents(peer: Peer.Instance){
 export function broadCastDataToPeers(payload:any){
     const stringifiedPayload= JSON.stringify(payload)
     for(const {peer} of peerLists){
+        if(!peer.connected) continue
         peer.send(stringifiedPayload)
     }
 }
