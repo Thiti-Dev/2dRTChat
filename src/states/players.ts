@@ -50,7 +50,7 @@ export class Players{
         if(diffDistance > VOIP_OUT_OF_RANGE_DISTANCE){
             this.mappedAudioElementBySocketID[data.id].volume = 0
         }else{
-            this.mappedAudioElementBySocketID[data.id].volume = ((((VOIP_OUT_OF_RANGE_DISTANCE- diffDistance)/VOIP_OUT_OF_RANGE_DISTANCE) * 100) / 100) / 100
+            this.mappedAudioElementBySocketID[data.id].volume = ((((VOIP_OUT_OF_RANGE_DISTANCE- diffDistance)/VOIP_OUT_OF_RANGE_DISTANCE) * 100) / 100) / 20 // the last /20 is to lower down the volume
         }
     }
 
@@ -94,7 +94,7 @@ export class Players{
             if(diffDistance > VOIP_OUT_OF_RANGE_DISTANCE){
                 this.mappedAudioElementBySocketID[socketID].volume = 0
             }else{
-                this.mappedAudioElementBySocketID[socketID].volume =( (((VOIP_OUT_OF_RANGE_DISTANCE- diffDistance)/VOIP_OUT_OF_RANGE_DISTANCE) * 100) / 100) / 100
+                this.mappedAudioElementBySocketID[socketID].volume =( (((VOIP_OUT_OF_RANGE_DISTANCE- diffDistance)/VOIP_OUT_OF_RANGE_DISTANCE) * 100) / 100) / 20 // the last /20 is to lower down the volume
             }
         }
     }
