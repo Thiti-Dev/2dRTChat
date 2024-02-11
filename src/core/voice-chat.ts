@@ -13,8 +13,10 @@ export async function setupAudioStreaming(socket: Socket){
             echoCancellation: true,
             noiseSuppression: true,
             channelCount: 2,
-            autoGainControl: true
+            autoGainControl: true,
         } });
+
+        initializeLocalStremDefault() // mute mic , . . . etc
 
         socket.emit("join room", "1234");
             socket.on("all users", (users) => {
@@ -96,7 +98,9 @@ function createPeer(userToSignal:string, callerID:string, stream:MediaStream) {
         socket.emit("sending signal", { userToSignal, callerID, signal })
     })
 
-    appendAudioElement(userToSignal, stream)
+    peer.on("stream", (receivedStream) => {
+        appendAudioElement(userToSignal, receivedStream)
+    })
 
     peer.on('data', Players.positioningEventHandler.bind(Players));
     setupPeerEvents(peer)
@@ -117,7 +121,10 @@ function addPeer(incomingSignal:SignalData, callerID:string, stream:MediaStream)
         socket.emit("returning signal", { signal, callerID })
     })
     peer.signal(incomingSignal);
-    appendAudioElement(callerID, stream)
+
+    peer.on("stream", (receivedStream) => {
+        appendAudioElement(callerID, receivedStream)
+    })
 
     peer.on('data', Players.positioningEventHandler.bind(Players));
     setupPeerEvents(peer)
@@ -147,4 +154,31 @@ export function broadCastDataToPeers(payload:any){
     for(const {peer} of peerLists){
         peer.send(stringifiedPayload)
     }
+}
+
+export async function pushToTalk(inAction: boolean){
+    const localAudioTrack = localStream.getAudioTracks()[0]
+    if(localAudioTrack.enabled && inAction) return // already enable
+
+    appContext.getProtagonistCharacter().setTalkingState(inAction)
+    localAudioTrack.enabled = inAction
+}
+
+function initializeLocalStremDefault(){
+    /* ------------------------------- MIC MUTING ------------------------------- */
+    localStream.getTracks().forEach(track => {
+        track.enabled = false;
+    });
+    /* -------------------------------------------------------------------------- */
+
+    /* ---------------------------- Proxy setting up ---------------------------- */
+    // const proxy = new Proxy(localStream.getAudioTracks()[0], {
+    //     set(target, property, value) {
+    //         if(property !== 'enabled') return false
+    //         type TProxiableMediaStream = Pick<MediaStreamTrack, 'enabled'>
+    //         target.enabled = value;
+    //         return true; // Indicates success
+    //       }
+    // })
+    /* -------------------------------------------------------------------------- */
 }
