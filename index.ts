@@ -5,6 +5,7 @@ import { PixiPlugin } from "gsap/PixiPlugin";
 gsap.registerPlugin(PixiPlugin);
 
 import './style.scss';
+import './background.scss'
 
 // To get rid of the process is not defined, when playing with the data-channel of simple-peer RTC
 import process from 'process';

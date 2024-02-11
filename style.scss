@@ -1,5 +1,7 @@
 // styles.scss
 $primary-color: #3498db;
+$canvas-width: 80vw;
+$canvas-min-allowed-width: 1600px;
 
 // Centering everything
 body, html {
@@ -10,11 +12,6 @@ body, html {
   align-items: center;
 }
 
-
-body {
-  background-color: $primary-color;
-}
-
 h1 {
   color: white;
 }
@@ -23,8 +20,8 @@ h1 {
   position: absolute;
   top:5%;
   font-family: 'Courier New', Courier, monospace;
-  background-color: grey;
-  color: blue;
+  background-color: #33333362;
+  color: white; /* Text color */
 }
 
 #my-id::before{
@@ -33,11 +30,32 @@ h1 {
 
 #main-pixi-container{
   text-align: center;
-  width: 1200px;
+  min-width: $canvas-min-allowed-width;
+  width: $canvas-width;
   height: 800px;
-  background-color: white;
+  //background-color: white;
+
+  box-shadow: 5px 4px 8px rgb(255, 255, 255);
 }
 
 #users{
   display: none;
+}
+
+footer {
+  position: absolute;
+  bottom: 5%;
+
+  background-color: #33333362; /* Background color */
+  color: white; /* Text color */
+  text-align: center; /* Center align text */
+  padding: 10px; /* Add some padding */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Drop shadow effect */
+}
+
+/* Styling for the game name */
+.game-name {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 24px; /* Font size */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow effect */
 }
