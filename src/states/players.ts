@@ -108,6 +108,10 @@ export class Players{
     public getPlayerFromSocketID(socketID: string){
         return this.playerDatas[socketID] ?? null
     }
+
+    public isPlayerExist(socketID:string){
+        return this.playerDatas.hasOwnProperty(socketID)
+    }
 }
 
 export default new Players()

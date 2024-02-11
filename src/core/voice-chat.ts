@@ -102,7 +102,7 @@ function appendAudioElement(socketID:string,stream:MediaStream){
     // enclosed
     const playerCharacter = players.getPlayerFromSocketID(socketID)
     //
-    async function checkAudioMuted() {
+    async function processTalkingIndicatorForPeersCharacter() {
         // Create a buffer to store frequency data
         const bufferLength = analyserNode.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
@@ -116,17 +116,21 @@ function appendAudioElement(socketID:string,stream:MediaStream){
             totalVolume += dataArray[i];
         }
         const averageVolume = totalVolume / bufferLength;
-        console.log(averageVolume)
+
 
         if(averageVolume === 0){
+
+            // Check if the player still exists otherwise we return and end the paradox
+            if(!players.isPlayerExist(socketID)) return // ends the cycle
+
             // if mute detected
             // set setTalkingState of this Character instance 
             playerCharacter.character.setTalkingState(false)
-            setTimeout(checkAudioMuted, 500);
+            setTimeout(processTalkingIndicatorForPeersCharacter, 500);
         }else{
             // when buffers still has bitsound going on nake it frequent
             playerCharacter.character.setTalkingState(true)
-            setTimeout(checkAudioMuted, 15);
+            setTimeout(processTalkingIndicatorForPeersCharacter, 15);
         }
         
 
@@ -146,7 +150,7 @@ function appendAudioElement(socketID:string,stream:MediaStream){
     }
 
     // Periodically check the audio data for mute status
-    setTimeout(checkAudioMuted, 15); // Adjust interval as needed
+    setTimeout(processTalkingIndicatorForPeersCharacter, 15); // Adjust interval as needed
     /* -------------------------------------------------------------------------- */
 }
 
