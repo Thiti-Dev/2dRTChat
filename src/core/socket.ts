@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 export function socketConnect(asWho: string){
-    const socket = io('http://localhost:3000',{query:{
+    const socket = io('https://rtc-signaling-thoroughfare.onrender.com',{query:{
         iam: asWho
     }})
 
