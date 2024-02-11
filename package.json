@@ -29,6 +29,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
+    "@pixi/gif": "^2.1.0",
     "@types/simple-peer": "^9.11.8",
     "gsap": "^3.12.5",
     "mobx": "^6.12.0",

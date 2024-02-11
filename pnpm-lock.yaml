@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@pixi/gif':
+    specifier: ^2.1.0
+    version: 2.1.0(@pixi/assets@7.4.0)(@pixi/core@7.4.0)(@pixi/display@7.4.0)(@pixi/sprite@7.4.0)
   '@types/simple-peer':
     specifier: ^9.11.8
     version: 9.11.8
@@ -309,6 +312,21 @@ packages:
       '@pixi/core': 7.4.0
     dependencies:
       '@pixi/core': 7.4.0
+    dev: false
+
+  /@pixi/gif@2.1.0(@pixi/assets@7.4.0)(@pixi/core@7.4.0)(@pixi/display@7.4.0)(@pixi/sprite@7.4.0):
+    resolution: {integrity: sha512-g0xVMgHzPdq7bX3UmUR5tiFpMP07u4reCEgSRKLwNQ95AnpRzQq3QtTsKosYMTrE9zZfr7TWlwdx1rFKs28SeA==}
+    engines: {node: '>=16', npm: '>=8', yarn: please-use-npm}
+    peerDependencies:
+      '@pixi/assets': ^7.0.0
+      '@pixi/core': ^7.0.0
+      '@pixi/display': ^7.0.0
+      '@pixi/sprite': ^7.0.0
+    dependencies:
+      '@pixi/assets': 7.4.0(@pixi/core@7.4.0)
+      '@pixi/core': 7.4.0
+      '@pixi/display': 7.4.0(@pixi/core@7.4.0)
+      '@pixi/sprite': 7.4.0(@pixi/core@7.4.0)(@pixi/display@7.4.0)
     dev: false
 
   /@pixi/graphics@7.4.0(@pixi/core@7.4.0)(@pixi/display@7.4.0)(@pixi/sprite@7.4.0):

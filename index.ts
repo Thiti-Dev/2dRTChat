@@ -19,6 +19,7 @@ import { createProtagonist, setupPixiApplication } from "./src/setup";
 import { setupAudioStreaming } from "./src/core/voice-chat";
 import appContext from "./src/states/app-context";
 import { socketConnect } from "./src/core/socket";
+import '@pixi/gif';
 import { AnimatedSprite, Assets } from "pixi.js";
 
 
@@ -31,7 +32,7 @@ const pixiContainer = document.getElementById('main-pixi-container');
 if(pixiContainer){
     (async() => {
         // assets loader
-        await Assets.load(["./assets/sheets/c1.json"])
+        await Assets.load(["./assets/sheets/c1.json", './assets/gifs/mosaic-blur.gif'])
         // -------------
 
         // Create a new Pixi application

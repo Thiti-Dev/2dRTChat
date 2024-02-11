@@ -4,13 +4,12 @@ import type { PlayerPositioningUpdatePayload } from "../shared/types";
 import appContext from "../states/app-context";
 import players from "../states/players";
 import { isAbsoluteNumber } from "../utils/maths/is-absolute-number";
+import { AnimatedGIF } from "@pixi/gif";
 
 export class Character{
     private sprite!: AnimatedSprite;
     private movingFactor = 0;
-    private hasJustGoneLeftDirection = false
     private container!:Container<DisplayObject>
-    private alreadyHasGoneLeft = false
     private socketID: string|null = null
     private nameTag:Text| null  = null
     private isProtagonist: boolean = false
@@ -20,6 +19,7 @@ export class Character{
         //this.setSprite(Sprite.from('https://pixijs.com/assets/flowerTop.png'))
         this.animatedSpriteBuilder()
         this.isProtagonist = protagonist
+
     }
 
     private getSocketID(){
@@ -45,7 +45,7 @@ export class Character{
     //     this.sprite = sprite
     // }
 
-    public spawnToScene(app: Container,x:number,y:number){
+    public async spawnToScene(app: Container,x:number,y:number){
         const container = new Container();
         container.x = x
         container.y = y
@@ -69,6 +69,16 @@ export class Character{
         
         nameTag.anchor.set(0.5)
         nameTag.y = -120
+
+        const blurryFace = Assets.cache.get("./assets/gifs/mosaic-blur.gif") as AnimatedGIF; // From cache -> Reuseable
+        const newBlurryFace = blurryFace.clone() // has to run .clone() otherwise when new character is created, the blurryFace of previous player will be stolen and apply to the newly created character
+        
+        this.sprite.addChild(newBlurryFace) // attach blurryFace to sprite
+        newBlurryFace.anchor.set(0.5)
+        newBlurryFace.width = 135
+        newBlurryFace.height = 135
+        newBlurryFace.position.set(30,-110)
+
 
         container.addChild(this.sprite)
         container.addChild(nameTag)
@@ -132,11 +142,9 @@ export class Character{
         window.addEventListener("keydown", (event) => {
             if(event.key === 'ArrowRight'){
                 this.movingFactor = 2
-                this.hasJustGoneLeftDirection = false
                 
             }else if (event.key === 'ArrowLeft'){
                 this.movingFactor = -2
-                this.hasJustGoneLeftDirection = true
             }
 
             if(event.key === 'v'){
