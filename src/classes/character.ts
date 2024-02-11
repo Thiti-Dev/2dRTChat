@@ -1,5 +1,5 @@
 import { AnimatedSprite, Application, Assets, Container, DisplayObject, Sprite, Text, TextStyle } from "pixi.js";
-import { broadCastDataToPeers } from "../core/voice-chat";
+import { broadCastDataToPeers, pushToTalk } from "../core/voice-chat";
 import type { PlayerPositioningUpdatePayload } from "../shared/types";
 import appContext from "../states/app-context";
 import players from "../states/players";
@@ -138,12 +138,21 @@ export class Character{
                 this.movingFactor = -2
                 this.hasJustGoneLeftDirection = true
             }
+
+            if(event.key === 'v'){
+                // push to talk . . .
+                pushToTalk(true) // spamming safe (spamable)
+            }
             event.preventDefault();
         }, false);
 
         window.addEventListener("keyup", (event) => {
             if(event.key === 'ArrowRight' || event.key === 'ArrowLeft'){
                 this.movingFactor = 0
+            }
+            if(event.key === 'v'){
+                // push to talk . . .
+                pushToTalk(false)
             }
             event.preventDefault();
         }, false);
@@ -161,6 +170,11 @@ export class Character{
     public setNameTag(name:string){
         if(!this.nameTag) return
         this.nameTag.text = name
+    }
+
+    public setTalkingState(talk: boolean){
+        if(!this.nameTag) return
+        this.nameTag.text = talk ? this.nameTag.text + " 🔊" : this.name
     }
 
     public getContainer(): Container{
