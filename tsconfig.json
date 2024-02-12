@@ -5,6 +5,7 @@
     "strict": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "useDefineForClassFields": true
-  }
+    "useDefineForClassFields": true  
+  },
+  "include": ["@types/*.d.ts","src/**/*.ts"]
 }
