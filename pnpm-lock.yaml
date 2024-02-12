@@ -40,6 +40,9 @@ devDependencies:
   css-loader:
     specifier: ^6.10.0
     version: 6.10.0(webpack@5.90.1)
+  dotenv-webpack:
+    specifier: ^8.0.1
+    version: 8.0.1(webpack@5.90.1)
   html-webpack-plugin:
     specifier: ^5.6.0
     version: 5.6.0(webpack@5.90.1)
@@ -316,7 +319,6 @@ packages:
 
   /@pixi/gif@2.1.0(@pixi/assets@7.4.0)(@pixi/core@7.4.0)(@pixi/display@7.4.0)(@pixi/sprite@7.4.0):
     resolution: {integrity: sha512-g0xVMgHzPdq7bX3UmUR5tiFpMP07u4reCEgSRKLwNQ95AnpRzQq3QtTsKosYMTrE9zZfr7TWlwdx1rFKs28SeA==}
-    engines: {node: '>=16', npm: '>=8', yarn: please-use-npm}
     peerDependencies:
       '@pixi/assets': ^7.0.0
       '@pixi/core': ^7.0.0
@@ -1437,6 +1439,27 @@ packages:
     dependencies:
       no-case: 3.0.4
       tslib: 2.6.2
+    dev: true
+
+  /dotenv-defaults@2.0.2:
+    resolution: {integrity: sha512-iOIzovWfsUHU91L5i8bJce3NYK5JXeAwH50Jh6+ARUdLiiGlYWfGw6UkzsYqaXZH/hjE/eCd/PlfM/qqyK0AMg==}
+    dependencies:
+      dotenv: 8.6.0
+    dev: true
+
+  /dotenv-webpack@8.0.1(webpack@5.90.1):
+    resolution: {integrity: sha512-CdrgfhZOnx4uB18SgaoP9XHRN2v48BbjuXQsZY5ixs5A8579NxQkmMxRtI7aTwSiSQcM2ao12Fdu+L3ZS3bG4w==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      webpack: ^4 || ^5
+    dependencies:
+      dotenv-defaults: 2.0.2
+      webpack: 5.90.1(webpack-cli@5.1.4)
+    dev: true
+
+  /dotenv@8.6.0:
+    resolution: {integrity: sha512-IrPdXQsk2BbzvCBGBOTmmSH5SodmqZNt4ERAZDmW4CT+tL8VtvinqywuANaFu4bOMWki16nqf0e4oC0QIaDr/g==}
+    engines: {node: '>=10'}
     dev: true
 
   /earcut@2.2.4:
