@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 module.exports = {
   entry: './index.ts', // Assuming your TypeScript file is named app.ts
   output: {
@@ -35,6 +36,7 @@ module.exports = {
     ],
   },
   plugins: [
+    new Dotenv(),
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[id].css',
