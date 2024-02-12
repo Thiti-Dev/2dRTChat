@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 export function socketConnect(asWho: string){
-    const socket = io('https://rtc-signaling-thoroughfare.onrender.com',{query:{
+    const socket = io(process.env.WEBSOCKET_HOST,{query:{
         iam: asWho
     }})
 
