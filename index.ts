@@ -20,9 +20,11 @@ import { setupAudioStreaming } from "./src/core/voice-chat";
 import appContext from "./src/states/app-context";
 import { socketConnect } from "./src/core/socket";
 import '@pixi/gif';
-import { AnimatedSprite, Assets } from "pixi.js";
+import { Assets } from "pixi.js";
 import { CANVAS_SIZE } from "./src/shared/constants/config";
 
+import {getContributionsDataForThePast30Days} from './src/core/graphql/queries'
+import {fromContributionsDataToTerrains, terrainAssetNamesToActualFileTakenPlace} from './src/core/terrain-generator'
 
 if (!new class { x:any }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly') // Mobx spec complaint ensuring
 
@@ -35,7 +37,7 @@ if(pixiContainer){
 
     (async() => {
         // assets loader
-        await Assets.load(["./assets/sheets/c1.json", './assets/gifs/mosaic-blur.gif'])
+        await Assets.load(["./assets/sheets/c1.json", './assets/gifs/mosaic-blur.gif', ...terrainAssetNamesToActualFileTakenPlace()])
         // -------------
 
         // Create a new Pixi application
@@ -55,5 +57,14 @@ if(pixiContainer){
         appContext.setSocketInstance(socket)
 
         setupAudioStreaming(socket)
+
+
+
+        //console.log(await getContributionsDataForThePast30Days("Thiti-Dev"))
+
+        // const tree = new Terrain("bench1")
+        // tree.spawnToScene(appContext.getWorldContainer(),600)
+        const contributionsData = await getContributionsDataForThePast30Days("Thiti-Dev")
+        fromContributionsDataToTerrains(contributionsData)
     })()
 }

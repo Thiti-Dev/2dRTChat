@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, Texture, TilingSprite } from "pixi.js";
+import { Application, Container, Graphics, Sprite, Texture, TilingSprite } from "pixi.js";
 import { Character } from "./classes/character";
 import appContext from "./states/app-context";
 import { CANVAS_SIZE } from "./shared/constants/config";
@@ -43,6 +43,8 @@ function createWorldContainer(app: Application<HTMLCanvasElement>):Container{
         const worldContainer = new Container()
         worldContainer.width = CANVAS_SIZE.WIDTH * 100
         worldContainer.height = CANVAS_SIZE.HEIGHT
+        worldContainer.sortableChildren = true // allow displaying dynamically z-index of each childs inside
+        
         app.stage.addChild(worldContainer)
         return worldContainer
 }
