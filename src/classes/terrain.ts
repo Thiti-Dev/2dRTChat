@@ -1,4 +1,4 @@
-import { Assets, Container, Sprite, Texture } from "pixi.js"
+import { Assets, Container, Sprite, Text, TextStyle, Texture } from "pixi.js"
 import appContext from "../states/app-context"
 
 export type AvailableTerrainModel = "tree8" |"tree9" |"tree10" | "tree11" | "bench1" | "bench2"| "bush1" | "bush2" | "bush3" | "rock1"
@@ -15,11 +15,27 @@ const AssetsConfiguration: Partial<Record<AvailableTerrainModel,{width:number,he
     bench1:{width: 450,height:300,yDef: 450}
 }
 
+const contributionLabelStyle = new TextStyle({
+    fontFamily: 'Courier New',
+    dropShadow: true,
+    dropShadowAlpha: 0.8,
+    dropShadowAngle: 2.1,
+    dropShadowBlur: 4,
+    dropShadowColor: '0x111111',
+    dropShadowDistance: 2,
+    fill: ['#FBFF05'],
+    stroke: '#000000',
+    fontSize: 14,
+    fontWeight: 'lighter',
+    lineJoin: 'round',
+    strokeThickness: 5,
+});
+
 export class Terrain{
     private terrainType: 'tree' = 'tree' // default tree type
     private sprite!: Sprite
     private container!: Container
-    constructor(private terrainModel: AvailableTerrainModel){
+    constructor(private terrainModel: AvailableTerrainModel, private timestamp?: string){
         this.createTerrainSprite() // create sprite
     }
 
@@ -44,6 +60,14 @@ export class Terrain{
         sprite.height = height
         container.addChild(sprite)
         container.zIndex = 1
+
+
+        // if timestamp presents, terrain is being created by contribution count process
+        if(this.timestamp){
+            const tag = new Text("🔨: " + this.timestamp,contributionLabelStyle);
+            tag.anchor.set(0.5)
+            container.addChild(tag)   
+        }
 
         this.sprite = sprite
         this.container = container
