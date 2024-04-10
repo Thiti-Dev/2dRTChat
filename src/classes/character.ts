@@ -16,7 +16,6 @@ export class Character{
     private hasBroadcastedDormantStateOnce: boolean = false
     constructor(private name: string,protagonist: boolean = false){
         console.log(`Character: ${name} has been initiated`)
-        //this.setSprite(Sprite.from('https://pixijs.com/assets/flowerTop.png'))
         this.animatedSpriteBuilder()
         this.isProtagonist = protagonist
 
@@ -39,11 +38,6 @@ export class Character{
         
         this.sprite = character
     }
-
-    // public setSprite(sprite: Sprite){
-    //     sprite.anchor.set(0.5)
-    //     this.sprite = sprite
-    // }
 
     public async spawnToScene(app: Container,x:number,y:number){
         const container = new Container();
@@ -82,6 +76,8 @@ export class Character{
 
         container.addChild(this.sprite)
         container.addChild(nameTag)
+        if(this.isProtagonist) container.zIndex = 999
+        else container.zIndex = 998
         app.addChild(container);
         this.nameTag = nameTag
         this.container = container
