@@ -14,7 +14,7 @@ export class Character{
     private nameTag:Text| null  = null
     private isProtagonist: boolean = false
     private hasBroadcastedDormantStateOnce: boolean = false
-    constructor(private name: string,protagonist: boolean = false){
+    constructor(public name: string,protagonist: boolean = false){
         console.log(`Character: ${name} has been initiated`)
         this.animatedSpriteBuilder()
         this.isProtagonist = protagonist

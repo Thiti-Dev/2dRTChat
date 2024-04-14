@@ -25,7 +25,7 @@ import { CANVAS_SIZE } from "./src/shared/constants/config";
 
 import {getContributionsDataForThePast30Days} from './src/core/graphql/queries'
 import {fromContributionsDataToTerrains, terrainAssetNamesToActualFileTakenPlace} from './src/core/terrain-generator'
-
+import {Envelop} from './src/classes/envelop'
 if (!new class { x:any }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly') // Mobx spec complaint ensuring
 
 
@@ -37,7 +37,7 @@ if(pixiContainer){
 
     (async() => {
         // assets loader
-        await Assets.load(["./assets/sheets/c1.json", './assets/gifs/mosaic-blur.gif', ...terrainAssetNamesToActualFileTakenPlace()])
+        await Assets.load(["./assets/envelop.png","./assets/sheets/c1.json", './assets/gifs/mosaic-blur.gif', ...terrainAssetNamesToActualFileTakenPlace()])
         // -------------
 
         // Create a new Pixi application
@@ -58,13 +58,12 @@ if(pixiContainer){
 
         setupAudioStreaming(socket)
 
-
-
-        //console.log(await getContributionsDataForThePast30Days("Thiti-Dev"))
-
-        // const tree = new Terrain("bench1")
-        // tree.spawnToScene(appContext.getWorldContainer(),600)
         const contributionsData = await getContributionsDataForThePast30Days("Thiti-Dev")
         fromContributionsDataToTerrains(contributionsData)
+
+        //envelops
+        Envelop.getAndCreateEnvelops()
+        Envelop.registerTicker(app)
+        Envelop.subscribeToNewEnvelopCreated()
     })()
 }
